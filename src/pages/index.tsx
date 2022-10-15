@@ -1,14 +1,14 @@
 import type { NextPage } from 'next';
-
-import Layout from '@/components/layout';
-import About from '@/components/about';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 const Home: NextPage = () => {
-  return (
-    <Layout>
-      <About />
-    </Layout>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/dashBoard');
+  }, [router]);
+  return <>redirect</>;
 };
 
 export default Home;

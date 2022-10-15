@@ -1,2 +1,2 @@
-export default class Common {
+export class Common {
 }
