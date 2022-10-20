@@ -11,8 +11,9 @@ interface IFNodeData extends IFNode {
     onAddNodeClick?: (data: IFNode) => (e: any) => void;
     onRemoveNodeClick?: (data: IFNode) => (e: any) => void;
   };
-  style?: Record<string, any>;
   position: { x: number; y: number };
+  style?: Record<string, any>;
+  selected?: boolean;
 }
 
 export class Node {
@@ -30,11 +31,19 @@ export class Node {
     return this.data.data.label;
   }
 
-  get positionX(){
+  get id() {
+    return this.data.id;
+  }
+
+  get selected() {
+    return this.data.selected;
+  }
+
+  get positionX() {
     return this.data.position.x;
   }
 
-  get positionY(){
+  get positionY() {
     return this.data.position.y;
   }
 
@@ -47,12 +56,12 @@ export class Node {
   }
 
   get onAddNodeClick() {
-    if(!this.data.data.onAddNodeClick)return undefined;
+    if (!this.data.data.onAddNodeClick) return undefined;
     return this.data.data.onAddNodeClick(this.data);
   }
 
   get onRemoveNodeClick() {
-    if(!this.data.data.onRemoveNodeClick)return undefined;
+    if (!this.data.data.onRemoveNodeClick) return undefined;
     return this.data.data.onRemoveNodeClick(this.data);
   }
 

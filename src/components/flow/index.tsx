@@ -16,13 +16,15 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import throttle from 'lodash/throttle';
+import Typography from '@mui/material/Typography';
+import { flowData } from '@/components/flow/dummyData';
+// import throttle from 'lodash/throttle';
 
-import { FlowMaster } from '@/components/share/flow/model/flowMaster';
+import { FlowMaster } from '@/components/flow/model/flowMaster';
 
-import { MultiConnectNode } from '@/components/share/flow/customNode/multiConnectNode';
-import { OutputNode } from '@/components/share/flow/customNode/outputNode';
-import { TriggerNode } from '@/components/share/flow/customNode/triggerNode';
+import { MultiConnectNode } from '@/components/flow/customNode/multiConnectNode';
+import { OutputNode } from '@/components/flow/customNode/outputNode';
+import { TriggerNode } from '@/components/flow/customNode/triggerNode';
 
 const connectionLineStyle = { stroke: '#fff' };
 const snapGrid: [number, number] = [5, 5];
@@ -34,82 +36,18 @@ const nodeTypes = {
 
 const Wrap = styled(Box)(({ theme }) => ({
   height: theme.spacing(40),
+  display: 'flex',
+  flexDirection: 'column',
 }));
 
-const flowData = {
-  nodes: [
-    {
-      id: '1',
-      type: 'triggerNode',
-      data: { label: 'Trigger', hasAddNode: true, hasRemoveNode: false },
-      style: { padding: 10, background: '#FFF', borderRadius: '3px' },
-      position: { x: 30, y: 50 },
-    },
-    {
-      id: '2',
-      type: 'multiConnectNode',
-      data: { hasAddNode: true, hasRemoveNode: true },
-      style: { padding: 10, background: '#FFF', borderRadius: '3px' },
-      position: { x: 400, y: 50 },
-    },
-    {
-      id: '3',
-      type: 'outputNode',
-      data: {
-        label: 'Slack',
-        settings: { api: '523523632512' },
-        hasAddNode: false,
-        hasRemoveNode: true,
-      },
-      style: { padding: 10, background: '#FFF', borderRadius: '3px' },
-      position: { x: 800, y: 50 },
-    },
-    {
-      id: '4',
-      type: 'outputNode',
-      data: {
-        label: 'Mail',
-        settings: { address: 'hoge@sample.com' },
-        hasAddNode: false,
-        hasRemoveNode: true,
-      },
-      style: { padding: 10, background: '#FFF', borderRadius: '3px' },
-      position: { x: 800, y: 150 },
-    },
-  ],
-  edges: [
-    {
-      id: 'e1-2',
-      source: '1',
-      target: '2',
-      animated: true,
-      style: { stroke: '#fff' },
-    },
-    {
-      id: 'e2-3',
-      source: '2',
-      target: '3',
-      // sourceHandle: 'a',
-      animated: true,
-      style: { stroke: '#fff' },
-    },
-    {
-      id: 'e2-4',
-      source: '2',
-      target: '4',
-      // sourceHandle: 'b',
-      animated: true,
-      style: { stroke: '#fff' },
-    },
-  ],
-};
-
-// eslint-disable-next-line
-const removeNodeHandler = (data: any) => (e: any) => {
-  console.log('data', data);
-  console.log('remove event', e);
-  alert('remove node exec');
-};
+const Title = styled(Typography)(({ theme }) => ({
+  color: theme.palette.common.white,
+  backgroundColor: '#1A192B',
+  fontWeight: 'bold',
+  textAlign: 'left',
+  padding: theme.spacing(1),
+  borderRadius: `${theme.spacing(0.5)} ${theme.spacing(0.5)} 0 0`
+}));
 
 const Content = () => {
   const theme = useTheme();
@@ -119,13 +57,24 @@ const Content = () => {
 
   const flowInstance = useMemo(() => new FlowMaster(flowData), []);
 
-  const addNodeHandler = useCallback((data: any) => (e: any) => {
-    if (data.type === 'multiConnectNode') {
-      flowInstance.addOutputNode(data);
-      setNodes(flowInstance.nodes);
-      setEdges(flowInstance.edges);
-    }
-  },[nodes]);
+  const addNodeHandler = useCallback(
+    // eslint-disable-next-line
+    (data: any) => (_e: any) => {
+      if (data.type === 'multiConnectNode') {
+        flowInstance.addOutputNode(data);
+        setNodes(flowInstance.nodes);
+        setEdges(flowInstance.edges);
+      }
+    },
+    [nodes]
+  );
+
+  // eslint-disable-next-line
+  const removeNodeHandler = (data: any) => (e: any) => {
+    flowInstance.removeNode(data);
+    setNodes(flowInstance.nodes);
+    setEdges(flowInstance.edges);
+  };
 
   useEffect(() => {
     setNodes(flowInstance.nodes);
@@ -160,19 +109,23 @@ const Content = () => {
 
   return (
     <Wrap>
+      <Title variant='h2'>ReactFlow Sample</Title>
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        style={{ background: '#1A192B', borderRadius: theme.spacing(1) }}
+        style={{
+          background: '#1A192B',
+          borderRadius: `0 0 ${theme.spacing(0.5)} ${theme.spacing(0.5)}`,
+        }}
         nodeTypes={nodeTypes}
         connectionLineStyle={connectionLineStyle}
         snapToGrid
         snapGrid={snapGrid}
         // fitView
-        // defaultViewport={{ x: 0, y: 300, zoom: 0.5 }}
+        defaultViewport={{ x: 0, y: 300, zoom: 0.5 }}
         // attributionPosition='bottom-left'
       >
         {/* <MiniMap

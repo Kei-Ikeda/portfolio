@@ -22,6 +22,35 @@ const theme = createTheme({
       main: '#2F3337',
     },
   },
+  typography: {
+    h1: {
+      fontSize: 24,
+    },
+    h2: {
+      fontSize: 20,
+    },
+    h3: {
+      fontSize: 18,
+    },
+    subtitle1: {
+      fontSize: 16,
+    },
+    subtitle2: {
+      fontSize: 14,
+    },
+    body1: {
+      fontSize: 14,
+    },
+    body2: {
+      fontSize: 13,
+    },
+    button: {
+      fontSize: 16,
+    },
+    caption: {
+      fontSize: 12,
+    },
+  },
   status: {
     danger: blue[500],
   },

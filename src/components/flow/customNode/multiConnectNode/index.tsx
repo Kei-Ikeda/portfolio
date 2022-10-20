@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
-import { Node } from '@/components/share/flow/model/node';
+import { Node } from '@/components/flow/model/node';
 
 const Wrap = styled(Box)(({ theme }) => ({
   width: theme.spacing(30),

@@ -1,5 +1,5 @@
-import { Node } from '@/components/share/flow/model/node';
-import { Edge } from '@/components/share/flow/model/edge';
+import { Node } from '@/components/flow/model/node';
+import { Edge } from '@/components/flow/model/edge';
 
 export class FlowMaster {
   private originallyNodesData;
@@ -7,6 +7,8 @@ export class FlowMaster {
 
   private hashedNodesInstanceData;
   private hashedEdgesInstanceData;
+
+  private DEFAULT_Y_POSITION = 50;
 
   constructor({ nodes, edges }: { nodes: any[]; edges: any[] }) {
     this.originallyNodesData = nodes;
@@ -71,18 +73,21 @@ export class FlowMaster {
   }
 
   private findChildNodeById(id: string) {
-    return Object.values(this.hashedEdgesInstanceData)
-      .filter((edge) => edge.source === id)
-      .reduce((acc, edge) => {
-        return {
-          ...acc,
-          [edge.target]: this.hashedNodesInstanceData[edge.target],
-        };
-      }, {});
+    const filteredEdges = Object.values(this.hashedEdgesInstanceData).filter(
+      (edge) => edge.source === id
+    );
+    if (!filteredEdges.length) return undefined;
+    return filteredEdges.reduce((acc, edge) => {
+      return {
+        ...acc,
+        [edge.target]: this.hashedNodesInstanceData[edge.target],
+      };
+    }, {});
   }
 
-  private findLowestNodePosition(id: string) {
+  private findLowestNodePositionY(id: string) {
     const targetNodes = this.findChildNodeById(id);
+    if (!targetNodes) return undefined;
     const lowestTarget: Node =
       targetNodes[
         Object.keys(targetNodes).reduce((a, b) =>
@@ -96,7 +101,7 @@ export class FlowMaster {
   }
 
   public addOutputNode(data: any) {
-    const referencePosition = this.findLowestNodePosition(data.id);
+    const referencePosition = this.findLowestNodePositionY(data.id);
     const sourceNodeData = {
       id: '123',
       type: 'outputNode',
@@ -107,7 +112,7 @@ export class FlowMaster {
         hasRemoveNode: true,
       },
       style: { padding: 10, background: '#FFF', borderRadius: '3px' },
-      position: { x: 800, y: referencePosition + 100 },
+      position: { x: 800, y: referencePosition ? referencePosition + 100 : 50 },
     };
 
     const sourceEdgeData = {
@@ -125,6 +130,32 @@ export class FlowMaster {
     this.hashedEdgesInstanceData = {
       ...this.hashedEdgesInstanceData,
       [sourceEdgeData.id]: new Edge(sourceEdgeData),
+    };
+  }
+
+  public removeNode(data: any) {
+    const { id } = data;
+    const childNode = this.findChildNodeById(id);
+    if (childNode) {
+      Object.keys(childNode).forEach((key) =>
+        this.removeNode(childNode[key as keyof typeof childNode])
+      );
+    }
+    this.hashedNodesInstanceData = {
+      ...Object.keys(this.hashedNodesInstanceData).reduce((acc, key) => {
+        if (this.hashedNodesInstanceData[key].id === id) {
+          return acc;
+        }
+        return { ...acc, [key]: this.hashedNodesInstanceData[key] };
+      }, {}),
+    };
+    this.hashedEdgesInstanceData = {
+      ...Object.keys(this.hashedEdgesInstanceData).reduce((acc, key) => {
+        if (this.hashedEdgesInstanceData[key].target === id) {
+          return acc;
+        }
+        return { ...acc, [key]: this.hashedEdgesInstanceData[key] };
+      }, {}),
     };
   }
 
